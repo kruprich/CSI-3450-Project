@@ -1,20 +1,4 @@
-DROP TABLE IF EXISTS Players;
-DROP TABLE IF EXISTS Teams;
-DROP TABLE IF EXISTS Leagues;
-DROP TABLE IF EXISTS Tournaments;
-DROP TABLE IF EXISTS Matches;
-DROP TABLE IF EXISTS GameTimeline;
-DROP TABLE IF EXISTS GameStats;
-DROP TABLE IF EXISTS Articles;
-DROP TABLE IF EXISTS Marquees;
-DROP TABLE IF EXISTS Videos;
-DROP TABLE IF EXISTS Streamgroups;
-DROP TABLE IF EXISTS PlayerStatsHistories;
 DROP TABLE IF EXISTS PlayerBios;
-DROP TABLE IF EXISTS PlayerSocialNetworks;
-DROP TABLE IF EXISTS PlayerStatsSummaries;
-DROP TABLE IF EXISTS PlayerStatsSummariesMostPlayedChampions;
-
 CREATE TABLE PlayerBios (
 	auto_id SERIAL PRIMARY KEY,
 	playerId INT REFERENCES Players(id),
@@ -22,6 +6,7 @@ CREATE TABLE PlayerBios (
 	bio TEXT
 );
 
+DROP TABLE IF EXISTS PlayerSocialNetworks;
 CREATE TABLE PlayerSocialNetworks (
 	auto_id SERIAL PRIMARY KEY,
 	playerId INT REFERENCES Players(id),
@@ -29,6 +14,7 @@ CREATE TABLE PlayerSocialNetworks (
 	url TEXT
 );
 
+DROP TABLE IF EXISTS Players;
 CREATE TABLE Players(
 	id INT PRIMARY KEY,
 	firstName TEXT,
@@ -40,6 +26,7 @@ CREATE TABLE Players(
 	birthdate TIMESTAMP WITH TIME ZONE,
 );
 
+DROP TABLE IF EXISTS PlayerStatsSummaries;
 CREATE TABLE PlayerStatsSummaries(
 	id SERIAL PRIMARY KEY,
 	playerId INT REFERENCES Players (id),
@@ -52,6 +39,7 @@ CREATE TABLE PlayerStatsSummaries(
 	mostPlayedChampionsId TEXT,
 );
 
+DROP TABLE IF EXISTS PlayerStatsSummariesMostPlayedChampions;
 CREATE TABLE PlayerStatsSummariesMostPlayedChampions(
 	auto_id SERIAL PRIMARY KEY,
 	playerStatsSummaryId INT REFERENCES PlayerStatsSummaries(id),
@@ -62,6 +50,7 @@ CREATE TABLE PlayerStatsSummariesMostPlayedChampions(
 	kdaRatioRank NUMERIC
 );
 
+DROP TABLE IF EXISTS TeamStatsSummaries;
 CREATE TABLE TeamStatsSummaries(
 	auto_id SERIAL PRIMARY KEY,
 	teamId INT REFERENCES Teams(id),
@@ -76,6 +65,7 @@ CREATE TABLE TeamStatsSummaries(
 );
 
 -- Percetage
+DROP TABLE IF EXISTS TeamStatsSummariesAverageDamageByPositions;
 CREATE TABLE TeamStatsSummariesAverageDamageByPositions(
 	auto_id SERIAL PRIMARY KEY,
 	teamId INT REFERENCES Teams(id),
@@ -85,6 +75,7 @@ CREATE TABLE TeamStatsSummariesAverageDamageByPositions(
 	jungle NUMERIC,
 );
 
+DROP TABLE IF EXISTS TeamRosterStats;
 CREATE TABLE TeamRosterStats(
 	auto_id SERIAL PRIMARY KEY,
 	teamId INT REFERENCES Teams(id),
@@ -97,6 +88,7 @@ CREATE TABLE TeamRosterStats(
 	summonerName TEXT
 );
 
+DROP TABLE IF EXISTS TeamRosterStatsChampions;
 CREATE TABLE TeamRosterStatsChampions(
 	auto_id SERIAL PRIMARY KEY,
 	teamId INT REFERENCES Teams(id),
@@ -104,6 +96,7 @@ CREATE TABLE TeamRosterStatsChampions(
 	championId INT REFERENCES Champions(id)
 );
 
+DROP TABLE IF EXISTS TeamStatsHistories;
 CREATE TABLE TeamStatsHistories(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
@@ -118,13 +111,15 @@ CREATE TABLE TeamStatsHistories(
 	gameId TEXT REFERENCES Games(id)
 );
 
+DROP TABLE IF EXISTS TeamStatsHistoriesChampions;
 CREATE TABLE TeamStatsHistoriesChampions(
 	auto_id SERIAL PRIMARY KEY,
 	teamStatsHistoriesId TEXT REFERENCES TeamStatsHistories(id),
 	championId INT REFERENCES Champions(id)
 );
 
- CREATE TABLE Teams(
+DROP TABLE IF EXISTS Team;
+CREATE TABLE Teams(
  	auto_id SERIAL,
  	id INT PRIMARY KEY,
  	name TEXT,
@@ -133,27 +128,38 @@ CREATE TABLE TeamStatsHistoriesChampions(
  	acronym TEXT,
   	altLogoURL TEXT,
   	homeLeague INT REFERENCES Leagues(id)
- );
+);
 
- CREATE TABLE TeamBios(
+DROP TABLE IF EXISTS TeamBios;
+CREATE TABLE TeamBios(
  	auto_id SERIAL PRIMARY KEY,
  	teamId INT REFERENCES Teams(id),
  	languageCode TEXT,
  	bio TEXT
- );
+);
 
- CREATE TABLE TeamStarters(
+DROP TABLE IF EXISTS TeamStarters;
+CREATE TABLE TeamStarters(
+ 	auto_id SERIAL PRIMARY KEY,
+ 	teamId INT REFERENCES Teams(id),
+	playerId INT REFERENCES Players(id)
+);
+
+DROP TABLE IF EXISTS TeamSubs;
+CREATE TABLE TeamSubs(
  	auto_id SERIAL PRIMARY KEY,
  	teamId INT REFERENCES Teams(id),
  	playerId INT REFERENCES Players(id)
- );
+);
 
- CREATE TABLE TeamSubs(
+DROP TABLE IF EXISTS TeamPlayers;
+CREATE TABLE TeamPlayers(
  	auto_id SERIAL PRIMARY KEY,
  	teamId INT REFERENCES Teams(id),
  	playerId INT REFERENCES Players(id)
- );
+);
 
+DROP TABLE IF EXISTS PlayerStatsHistories;
 CREATE TABLE PlayerStatsHistories(
 	auto_id SERIAL;
 	id TEXT PRIMARY KEY,
@@ -173,7 +179,7 @@ CREATE TABLE PlayerStatsHistories(
 	gameId TEXT REFERENCES Games(id),
 );
 
-
+DROP TABLE IF EXISTS Tournaments;
 CREATE TABLE Tournaments(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
@@ -182,6 +188,7 @@ CREATE TABLE Tournaments(
 	leagueId INT REFERENCES Leagues(id),
 );
 
+DROP TABLE IF EXISTS TournamentTeams;
 CREATE TABLE TournamentTeams(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
@@ -189,6 +196,7 @@ CREATE TABLE TournamentTeams(
 	teamId INT REFERENCES Teams(id)
 );
 
+DROP TABLE IF EXISTS TournamentBrackets;
 CREATE TABLE TournamentBrackets(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
@@ -198,6 +206,7 @@ CREATE TABLE TournamentBrackets(
 
 );
 
+DROP TABLE IF EXISTS TournamentBracketTypes;
 CREATE TABLE TournamentBracketTypes(
 	auto_id SERIAL PRIMARY KEY,
 	tournamentId TEXT REFERENCES Tournaments(id),
@@ -206,6 +215,7 @@ CREATE TABLE TournamentBracketTypes(
 	rounds INT,
 );
 
+DROP TABLE IF EXISTS TournamentBracketMatchTypes
 CREATE TABLE TournamentBracketMatchTypes(
 	auto_id SERIAL PRIMARY KEY,
 	tournamentId TEXT REFERENCES Tournaments(id),
@@ -214,6 +224,7 @@ CREATE TABLE TournamentBracketMatchTypes(
 	bestOf INT,
 );
 
+DROP TABLE IF EXISTS TournamentBracketRosters;
 CREATE TABLE TournamentBracketRosters(
 	auto_id SERIAL PRIMARY KEY,
 	tournamentId TEXT REFERENCES Tournaments(id),
@@ -221,6 +232,7 @@ CREATE TABLE TournamentBracketRosters(
 	roster TEXT REFERENCES TournamentRosters(id),
 );
 
+DROP TABLE IF EXISTS TournamentRosters;
 CREATE TABLE TournamentRosters(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
@@ -229,6 +241,7 @@ CREATE TABLE TournamentRosters(
 	tournamentId TEXT REFERENCES Tournaments(id)
 );
 
+DROP TABLE IF EXISTS LeagueAbouts;
 CREATE TABLE LeagueAbouts(
 	auto_id SERIAL PRIMARY KEY,
 	leagueId INT REFERENCES Leauges(id),
@@ -236,6 +249,7 @@ CREATE TABLE LeagueAbouts(
  	about TEXT
 );
 
+DROP TABLE IF EXISTS LeagueNames;
 CREATE TABLE LeagueNames(
 	auto_id SERIAL PRIMARY KEY,
 	leagueId INT REFERENCES Leauges(id),
@@ -243,6 +257,7 @@ CREATE TABLE LeagueNames(
  	name TEXT
 );
 
+DROP TABLE IF EXISTS LeagueTournamentRecords;
 CREATE TABLE LeagueTournamentRecords(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
@@ -255,6 +270,7 @@ CREATE TABLE LeagueTournamentRecords(
 	score INT
 );
 
+DROP TABLE IF EXISTS Leagues;
 CREATE TABLE Leagues(
 	auto_id SERIAL,
 	id INT PRIMARY KEY,
@@ -263,6 +279,7 @@ CREATE TABLE Leagues(
 	logoURL TEXT,
 );
 
+DROP TABLE IF EXISTS Matches;
 CREATE TABLE Matches(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
@@ -273,18 +290,241 @@ CREATE TABLE Matches(
 
 );
 
+DROP TABLE IF EXISTS Games;
 CREATE TABLE Games(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
-	tournamentId TEXT REFERENCES Tournaments(id),
-	bracketId TEXT REFERENCES TournamentBrackets(id),
 	matchId TEXT REFERENCES Matches(id),
+	bracketId TEXT REFERENCES TournamentBrackets(id),
+	tournamentId TEXT REFERENCES Tournaments(id),
 	name TEXT,
 );
 
+DROP TABLE IF EXISTS GameStats;
+CREATE TABLE GameStats(
+	auto_id SERIAL,
+	gameId TEXT PRIMARY KEY REFERENCES Games(id),
+	platformId TEXT,
+	gameCreation NUMERIC,
+	gameDuration INT,
+	mapId INT REFERENCES Maps(id),
+	seasonId INT,
+	gameVersion TEXT, -- relates to patch #
+	gameMode TEXT, -- create game mode type table, ref it
+);
+
+DROP TABLE IF EXISTS GameStatTeams;
+CREATE TABLE GameStatTeams(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	teamId INT, -- is 100 and 200, we can modify this to be the actual teamid
+	win BOOLEAN,
+	firstBlood BOOLEAN,
+	firstTower BOOLEAN,
+	firstInhibitor BOOLEAN,
+	firstBaron BOOLEAN,
+	firstDragon BOOLEAN,
+	firstRiftHerald BOOLEAN,
+	towerKills INT,
+	inhibitorKills INT,
+	baronKils INT,
+	dragonKills INT,
+	vilemawKills INT,
+	riftHeraldKills INT,
+	dominionVictoryScore INT,
+);
+
+DROP TABLE IF EXISTS GameStatTeamBans;
+CREATE TABLE GameStatTeamBans(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	teamId INT REFERENCES GameStatTeams(teamId),
+	championId INT REFERENCES Champions(id),
+	pickTurn INT,
+);
+
+DROP TABLE IF EXISTS GameStatsParticipants;
+CREATE TABLE GameStatsParticipants(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	participantId INT,
+	summonerName TEXT,
+	profileIcon INT,
+	teamId INT,
+	championId INT REFERENCES Champions(id),
+	spell1Id INT REFERENCES SummonerSpells(id),
+	spell2Id INT REFERENCES SummonerSpells(id),
+	...
+);
+
+DROP TABLE IF EXISTS GameTimelines;
+CREATE TABLE GameTimelines(
+	auto_id SERIAL,
+	gameId TEXT PRIMARY KEY REFERENCES Games(id),
+	frameInterval INT,
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventWardPlaced;
+CREATE TABLE GameTimelineFrameEventWardPlaced(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	wardType TEXT REFERENCES GameTimelineFrameEventWardTypes(wardType),
+	creatorId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventWardKill;
+CREATE TABLE GameTimelineFrameEventWardKill(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	wardType TEXT REFERENCES GameTimelineFrameEventWardTypes(wardType),
+	killerId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventItemPurchased;
+CREATE TABLE GameTimelineFrameEventItemPurchased(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	itemId TEXT REFERENCES Items(id),
+	participantId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventItemSold;
+CREATE TABLE GameTimelineFrameEventItemSold(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	itemId TEXT REFERENCES Items(id),
+	participantId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventItemDestroyed;
+CREATE TABLE GameTimelineFrameEventItemDestroyed(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	itemId TEXT REFERENCES Items(id),
+	participantId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventSkillLevelUp;
+CREATE TABLE GameTimelineFrameEventSkillLevelUp(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	skillSlot INT,
+	participantId INT REFERENCES ...., (participantId),
+	levelUpType TEXT,
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventBuildingKill;
+CREATE TABLE GameTimelineFrameEventBuildingKill(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	xPosition INT,
+	yPosition INT,
+	killerId INT REFERENCES ...., (participantId),
+	teamId INT,
+	buildingType TEXT,
+	laneType TEXT,
+	towerType TEXT,
+	-- assistingParticipantsId -- Make new table
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventChampionKill;
+CREATE TABLE GameTimelineFrameEventChampionKill(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	xPosition INT,
+	yPosition INT,
+	killerId INT REFERENCES ...., (participantId),
+	victimId INT REFERENCES ...., (participantId),
+	-- assistingParticipantsId -- Make new table
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventEliteMonsterKill;
+CREATE TABLE GameTimelineFrameEventEliteMonsterKill(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	xPosition INT,
+	yPosition INT,
+	killerId INT REFERENCES ...., (participantId),
+	monsterType TEXT,
+	monsterSubType TEXT,
+	-- assistingParticipantsId -- Make new table?????????
+);
+
+
+DROP TABLE IF EXISTS GameTimelineFrameEventEliteMonsterTypes;
+CREATE TABLE GameTimelineFrameEventEliteMonsterTypes(
+	auto_id SERIAL,
+	monsterType TEXT PRIMARY KEY,
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventEliteMonsterSubTypes;
+CREATE TABLE GameTimelineFrameEventEliteMonsterSubTypes(
+	auto_id SERIAL,
+	monsterSubType TEXT PRIMARY KEY,
+);
+
+
+DROP TABLE IF EXISTS GameTimelineFrameEventTypes;
+CREATE TABLE GameTimelineFrameEventTypes(
+	auto_id SERIAL,
+	type TEXT PRIMARY KEY,
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventWardTypes;
+CREATE TABLE GameTimelineFrameEventWardTypes(
+	auto_id SERIAL,
+	wardType TEXT PRIMARY KEY,
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEvents;
+CREATE TABLE GameTimelineFrameEvents(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT REFERENCES GameTimelineFrameEventTypes(type),
+	_timestamp INT,
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameParticipantFrames;
+CREATE TABLE GameTimelineFrameParticipantFrames(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	participantId INT, -- Maybe add/change to playerId
+	xPosition INT,
+	yPosition INT,
+	currentGold INT,
+	totalGold INT,
+	level INT,
+	xp INT,
+	minionsKilled INT,
+	jungleMinionsKilled INT,
+	dominionScore INT,
+	teamScore INT,
+	_timestamp INT,
+);
+
+
+-------------------- THESE ARE EXAMPLES. THEY ARE NOT CORRECT. NEED TO BE UPDATED -------------------------
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------
-DROP FUNCTION IF EXISTS "addPlayer"(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP WITH TIME ZONE);
-CREATE OR REPLACE FUNCTION "addPlayer"(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP WITH TIME ZONE)
+DROP FUNCTION IF EXISTS "addPlayer"(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP);
+CREATE OR REPLACE FUNCTION "addPlayer"(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP)
 	RETURNS INT AS $BODY$
 DECLARE
 	playerId INT;
@@ -303,7 +543,7 @@ $BODY$
 
 DROP FUNCTION IF EXISTS "getSpecificPlayer"(id INT);
 CREATE OR REPLACE FUNCTION "getSpecificPlayer"(id INT) 
-RETURNS TABLE(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP WITH TIME ZONE) AS $$
+RETURNS TABLE(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP) AS $$
 		SELECT id, firstName, lastName, inGameName, photoURL, region, birthdate, birthdate
 		FROM Players
 		WHERE id=$1
