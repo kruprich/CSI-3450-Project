@@ -78,55 +78,59 @@ def getPlayerTournamentStats(tournamentId):
 
 ##################################################
 def getAPIVersion(region):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/realms/" + region + ".js")
+	r = requests.get("https://ddragon.leagueoflegends.com/realms/" + region + ".js")
 	return tryJSON(r)
 
 def getLanguages():
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/languages.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/languages.json")
 	return tryJSON(r)
 
 def getAPIVersions():
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/api/versions.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/api/versions.json")
 	return json.loads(r.text)
 
 def getRunesData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/rune.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/rune.json")
 	return tryJSON(r)
 
 def getMasteriesData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/mastery.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/mastery.json")
+	return tryJSON(r)
+
+def getRunesReforgedData(version, language):
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/runesReforged.json")
 	return tryJSON(r)
 
 def getChampionsData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/champion.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/champion.json")
 	return tryJSON(r)
 
 def getItemsData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/item.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/item.json")
 	return tryJSON(r)
 
 def getLanguagesData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/language.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/language.json")
 	return tryJSON(r)
 
 def getSummonersData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/summoner.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/summoner.json")
 	return tryJSON(r)
 
 def getChampionData(version, language, champion):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/champion/" + champion + ".json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/champion/" + champion + ".json")
 	return tryJSON(r)
 
 def getChampionsData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/championFull.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/championFull.json")
 	return tryJSON(r)
 
 def getMapsData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/map.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/map.json")
 	return tryJSON(r)
 
 def getProfileIconsData(version, language):
-	r = requests.get("http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/data/" + language + "/profileicon.json")
+	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/profileicon.json")
 	return tryJSON(r)
 
 def getMiscData(version, language):
@@ -140,59 +144,59 @@ def getStickersData(version, language):
 ####################################################################################################################################
 # Un-comment the saveImage... and comment out the returns to save to file. Also, change return .... to url = <the url>
 def getChampionIcon(version, champion):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/champion/" + champion
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/champion/" + champion
 	#saveImageToFile(url, "/assets/leagueoflegends/champion/icon/" + champion + ".png")
 
 def getSpellImage(version, spell):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/spell/" + spell
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/spell/" + spell
 	#saveImageToFile(url, "/assets/leagueoflegends/spell/" + spell + ".png")
 
 def getItemImage(version, item):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/item/" + item
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/item/" + item
 	#saveImageToFile(url, "/assets/leagueoflegends/item/" + item + ".png")
 
 def getRuneImage(version, rune):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/rune/" + rune
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/rune/" + rune
 	#saveImageToFile(url, "/assets/leagueoflegends/rune/" + rune + ".png")
 
 def getSprite(version, sprite):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/sprite/" + sprite
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/sprite/" + sprite
 	#saveImageToFile(url, "/assets/leagueoflegends/sprite/" + sprite + ".png")
 
 def getProfileIcon(version, icon):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/profileicon/" + icon
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/profileicon/" + icon
 	#saveImageToFile(url, "/assets/leagueoflegends/profileIcon/" + icon + ".png")
 
 def getBgImage(imageName):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/img/bg/" + imageName
+	return "https://ddragon.leagueoflegends.com/cdn/img/bg/" + imageName
 	#saveImageToFile(url, "/assets/leagueoflegends/bg/" + imageName + ".png")
 
 def getLoadingImage(champion, skin):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/img/champion/loading/" + champion + "_" + str(skin) + ".jpg"
+	return "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/" + champion + "_" + str(skin) + ".jpg"
 	#saveImageToFile(url, "/assets/leagueoflegends/champion/loading/" + champion + "_" + skin + ".jpg")
 
 def getSplashImage(champion, skin):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/img/champion/splash/" + champion + "_" + str(skin) + ".jpg"
+	return "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/" + champion + "_" + str(skin) + ".jpg"
 	#saveImageToFile(url, "/assets/leagueoflegends/champion/splash/" + champion + "_" + skin + ".jpg")
 
 def getGlobalImage(imageName):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/img/global/" + imageName
+	return "https://ddragon.leagueoflegends.com/cdn/img/global/" + imageName
 	#saveImageToFile(url, "/assets/leagueoflegends/global/" + imageName)
 
 def getMasteryImage(version, mastery):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/mastery/" + mastery
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/mastery/" + mastery
 	#saveImageToFile(url, "/assets/leagueoflegends/mastery/" + imageName)
 
 def getMapImage(version, _map):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/map/" + _map
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/map/" + _map
 	#saveImageToFile(url, "/assets/leagueoflegends/map/" + _map)
 
 def getPassiveImage(version, passive):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/passive/" + passive
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/passive/" + passive
 	#saveImageToFile(url, "/assets/leagueoflegends/passive/" + passive)
 
 def getStickerImage(version, sticker):
-	return "http://datadragon-new-807633007.us-east-1.elb.amazonaws.com/cdn/" + version + "/img/sticker/" + sticker
+	return "https://ddragon.leagueoflegends.com/cdn/" + version + "/img/sticker/" + sticker
 
 ####################################################################################
 

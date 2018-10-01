@@ -10,11 +10,46 @@ conn = psycopg2.connect(database="", user="", password="")
 
 # example function
 # sql statement: CREATE OR REPLACE FUNCTION "addPlayer"(firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP)
-def addPlayer():
+def addPlayer(player):
 	curr = conn.cursor()
-
 	SQL_STATEMENT_STRING = 'SELECT * FROM "addPlayer"(CAST(%s AS TEXT), CAST(%s AS TEXT), CAST(%s AS TEXT), CAST(%s AS TEXT), %s, %s)'
 	values = [firstName, lastName, inGameName, photoURL, region, birthdate]
+	executeSQL(curr, SQL_STATEMENT_STRING, values)
+	result = curr.fetchone()
+	conn.commit()
+	curr.close()
+
+def updatePlayer():
+	curr = conn.cursor()
+	SQL_STATEMENT_STRING = 'SELECT * FROM "updatePlayer"()'
+	values = []
+	executeSQL(curr, SQL_STATEMENT_STRING, values)
+	result = curr.fetchone()
+	conn.commit()
+	curr.close()
+
+def deletePlayer():
+	curr = conn.cursor()
+	SQL_STATEMENT_STRING = 'SELECT * FROM "deletePlayer"()'
+	values = []
+	executeSQL(curr, SQL_STATEMENT_STRING, values)
+	result = curr.fetchone()
+	conn.commit()
+	curr.close()
+
+def addLeague(league):
+	curr = conn.cursor()
+	SQL_STATEMENT_STRING = 'SELECT * FROM "addLeague"()'
+	values = []
+	executeSQL(curr, SQL_STATEMENT_STRING, values)
+	result = curr.fetchone()
+	conn.commit()
+	curr.close()
+
+def getLeague(leagueId):
+	curr = conn.cursor()
+	SQL_STATEMENT_STRING = 'SELECT * FROM "getLeague"(%s)'
+	values = [leagueId]
 	executeSQL(curr, SQL_STATEMENT_STRING, values)
 	result = curr.fetchone()
 	conn.commit()
