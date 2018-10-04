@@ -121,7 +121,7 @@ def getChampionData(version, language, champion):
 	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/champion/" + champion + ".json")
 	return tryJSON(r)
 
-def getChampionsData(version, language):
+def getChampionsFullData(version, language):
 	r = requests.get("https://ddragon.leagueoflegends.com/cdn/" + version + "/data/" + language + "/championFull.json")
 	return tryJSON(r)
 

@@ -1,19 +1,3 @@
-DROP TABLE IF EXISTS PlayerBios;
-CREATE TABLE PlayerBios (
-	auto_id SERIAL PRIMARY KEY,
-	playerId INT REFERENCES Players(id),
-	languageCode TEXT,
-	bio TEXT
-);
-
-DROP TABLE IF EXISTS PlayerSocialNetworks;
-CREATE TABLE PlayerSocialNetworks (
-	auto_id SERIAL PRIMARY KEY,
-	playerId INT REFERENCES Players(id),
-	networkName TEXT,
-	url TEXT
-);
-
 DROP TABLE IF EXISTS Players;
 CREATE TABLE Players(
 	id INT PRIMARY KEY,
@@ -24,6 +8,22 @@ CREATE TABLE Players(
 	hometown TEXT,
 	region INT,
 	birthdate TIMESTAMP WITH TIME ZONE,
+);
+
+DROP TABLE IF EXISTS PlayerBios;
+CREATE TABLE PlayerBios (
+	auto_id SERIAL PRIMARY KEY,
+	playerId INT REFERENCES Players(id),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	bio TEXT
+);
+
+DROP TABLE IF EXISTS PlayerSocialNetworks;
+CREATE TABLE PlayerSocialNetworks (
+	auto_id SERIAL PRIMARY KEY,
+	playerId INT REFERENCES Players(id),
+	networkName TEXT,
+	url TEXT
 );
 
 DROP TABLE IF EXISTS PlayerStatsSummaries;
@@ -48,6 +48,25 @@ CREATE TABLE PlayerStatsSummariesMostPlayedChampions(
 	losses INT,
 	total INT,
 	kdaRatioRank NUMERIC
+);
+
+DROP TABLE IF EXISTS PlayerTournamentStats;
+CREATE TABLE PlayerTournamentStats(
+	auto_id SERIAL PRIMARY KEY,
+	playerId INT REFERENCES Players(id),
+	teamId INT REFERENCES Teams(id),
+	name TEXT,
+	position TEXT,
+	teamAcronym TEXT,
+	gamesPlayed INT,
+	kda NUMERIC,
+	kills INT,
+	deaths INT,
+	assists INT,
+	killParticipation NUMERIC,
+	csPerMin NUMERIC,
+	cs INT,
+	minutesPlayed INT
 );
 
 DROP TABLE IF EXISTS TeamStatsSummaries;
@@ -134,7 +153,7 @@ DROP TABLE IF EXISTS TeamBios;
 CREATE TABLE TeamBios(
  	auto_id SERIAL PRIMARY KEY,
  	teamId INT REFERENCES Teams(id),
- 	languageCode TEXT,
+ 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
  	bio TEXT
 );
 
@@ -245,7 +264,7 @@ DROP TABLE IF EXISTS LeagueAbouts;
 CREATE TABLE LeagueAbouts(
 	auto_id SERIAL PRIMARY KEY,
 	leagueId INT REFERENCES Leauges(id),
- 	languageCode TEXT,
+ 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
  	about TEXT
 );
 
@@ -253,7 +272,7 @@ DROP TABLE IF EXISTS LeagueNames;
 CREATE TABLE LeagueNames(
 	auto_id SERIAL PRIMARY KEY,
 	leagueId INT REFERENCES Leauges(id),
- 	languageCode TEXT,
+ 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
  	name TEXT
 );
 
@@ -520,14 +539,18 @@ CREATE TABLE GameTimelineFrameParticipantFrames(
 	_timestamp INT,
 );
 
-
-
-
-
-
+DROP TABLE IF EXISTS Videos;
+CREATE TABLE Videos(
+	auto_id SERIAL,
+	id INT PRIMARY KEY,
+	tournamentId TEXT REFERENCES Tournaments(id),
+	gameId TEXT REFERENCES Games(id),
+	matchId TEXT REFERENCES Matches(id),
+	url TEXT,
+	locale TEXT, -- languageCode TEXT REFERENCES LanguageCodes(languageCode)
+);
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------- STATIC DATA ------------------------------------------------------------------------------------------------------------------------------
-
 DROP TABLE IF EXISTS LanguageCodes;
 CREATE TABLE LanguageCodes(
 	auto_id SERIAL,
@@ -538,7 +561,7 @@ CREATE TABLE LanguageCodes(
 DROP TABLE IF EXISTS Languages; --- Better name
 CREATE TABLE Languages(
 	auto_id SERIAL PRIMARY KEY,
-	languageCode TEXT,
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	language TEXT,
 );
 
@@ -553,10 +576,7 @@ CREATE TABLE Items(
 	auto_id SERIAL,
 	patch TEXT PRIMARY KEY,
 	id INT,
-	name TEXT,
-	description TEXT,
-	plaintext TEXT,
-	requiredChampion TEXT/INT,
+	requiredChampion INT REFERENCES Champions(id),
 	inStore BOOLEAN,
 	baseGold INT,
 	purchasable BOOLEAN,
@@ -564,6 +584,33 @@ CREATE TABLE Items(
 	sellGold INT,
 	hideFromAll BOOLEAN,
 	specialRecipie INT REFERENCES .... (id)
+);
+
+DROP TABLE IF EXISTS ItemNames;
+CREATE TABLE ItemNames(
+	auto_id SERIAL PRIMARY KEY,
+	itemId INT REFERENCES Items(id),
+	patch TEXT REFERENCES Patches(patch),
+	anguageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+);
+
+DROP TABLE IF EXISTS ItemDescriptions;
+CREATE TABLE ItemDescriptions(
+	auto_id SERIAL PRIMARY KEY,
+	itemId INT REFERENCES Items(id),
+	patch TEXT REFERENCES Patches(patch),
+	anguageCode TEXT REFERENCES LanguageCodes(languageCode),
+	description TEXT,
+);
+
+DROP TABLE IF EXISTS ItemPlaintexts;
+CREATE TABLE ItemPlaintexts(
+	auto_id SERIAL PRIMARY KEY,
+	itemId INT REFERENCES Items(id),
+	patch TEXT REFERENCES Patches(patch),
+	anguageCode TEXT REFERENCES LanguageCodes(languageCode),
+	plaintext TEXT,
 );
 
 DROP TABLE IF EXISTS ItemTags;
@@ -628,11 +675,10 @@ CREATE TABLE ItemImages(
 	h INT,
 );
 
-
 DROP TABLE IF EXISTS Champions;
 CREATE TABLE Champions(
 	auto_id SERIAL PRIMARY KEY,
-	patch TEXT,
+	patch TEXT REFERENCES Patches(patch),
 	id INT,
 	parType TEXT,
 
@@ -642,8 +688,8 @@ DROP TABLE IF EXISTS ChampionNames;
 CREATE TABLE ChampionNames(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	name TEXT,
 );
 
@@ -651,8 +697,8 @@ DROP TABLE IF EXISTS ChampionTitles;
 CREATE TABLE ChampionTitles(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	title TEXT,
 );
 
@@ -660,8 +706,8 @@ DROP TABLE IF EXISTS ChampionLores;
 CREATE TABLE ChampionLores(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	lore TEXT,
 );
 
@@ -669,16 +715,16 @@ DROP TABLE IF EXISTS ChampionBlurbs;
 CREATE TABLE ChampionBlurbs(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	blurb TEXT,
 );
 
 DROP TABLE IF EXISTS ChampionAllyTips;
 CREATE TABLE ChampionAllyTips(
 	auto_id SERIAL PRIMARY KEY,
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	tip TEXT,
 );
 
@@ -686,8 +732,8 @@ DROP TABLE IF EXISTS ChampionEnemyTips;
 CREATE TABLE ChampionEnemyTips(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	tip TEXT,
 );
 
@@ -695,7 +741,7 @@ DROP TABLE IF EXISTS ChampionInfos;
 CREATE TABLE ChampionInfos(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT REFERENCES Champions(patch),
+	patch TEXT REFERENCES Patches(patch),
 	attack INT,
 	defense INT,
 	magic INT,
@@ -706,7 +752,7 @@ DROP TABLE IF EXISTS ChampionTags;
 CREATE TABLE ChampionTags(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT REFERENCES Champions(patch)
+	patch TEXT REFERENCES Patches(patch)
 	tag TEXT,
 );
 
@@ -714,7 +760,7 @@ DROP TABLE IF EXISTS ChampionStats;
 CREATE TABLE ChampionStats(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT REFERENCES Champions(patch)
+	patch TEXT REFERENCES Patches(patch)
 	hp INT,
 	hpPerLevel INT,
 	mp INT,
@@ -737,12 +783,60 @@ CREATE TABLE ChampionStats(
 	attackSpeedPerLevel NUMERIC
 );
 
+DROP TABLE IF EXISTS ChampionSkins;
+CREATE TABLE ChampionSkins(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+	num INT,
+	hasChromas BOOLEAN,
+);
+
+DROP TABLE IF EXISTS ChampionSquareImages;
+CREATE TABLE ChampionSquareImages(
+	auto_id SERIAL PRIMARY KEY,
+	championId INT REFERENCES Champions(id),
+	patch TEXT REFERENCES Patches(patch),
+	imageURL TEXT,
+);
+
+DROP TABLE IF EXISTS ChampionSplashImages;
+CREATE TABLE ChampionSplashImages(
+	auto_id SERIAL PRIMARY KEY,
+	championId INT REFERENCES Champions(id),
+	patch TEXT REFERENCES Patches(patch),
+	skinId INT REFERENCES ChampionSkins(id),
+	imageURL TEXT,
+);
+
+DROP TABLE IF EXISTS ChampionLoadingImages;
+CREATE TABLE ChampionLoadingImages(
+	auto_id SERIAL PRIMARY KEY,
+	championId INT REFERENCES Champions(id),
+	patch TEXT REFERENCES Patches(patch),
+	skinId INT REFERENCES ChampionSkins(id),
+	imageURL TEXT,
+);
+
+DROP TABLE IF EXISTS ChampionSprites;
+CREATE TABLE ChampionLoadingImages(
+	auto_id SERIAL PRIMARY KEY,
+	championId INT REFERENCES Champions(id),
+	patch TEXT REFERENCES Patches(patch),
+	imageURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT
+);
+
 DROP TABLE IF EXISTS ChampionSpells;
 CREATE TABLE ChampionSpells(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT,
+	patch TEXT REFERENCES Patches(patch),
 	cooldownBurn TEXT,
 	costBurn TEXT,
 	costType TEXT,
@@ -756,8 +850,8 @@ CREATE TABLE ChampionSpellNames(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
 	spellId TEXT REFERENCES ChampionSpells(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	name TEXT,
 );
 
@@ -765,8 +859,8 @@ DROP TABLE IF EXISTS ChampionSpellDescriptions;
 CREATE TABLE ChampionSpellDescriptions(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	description TEXT,
 );
 
@@ -775,8 +869,8 @@ CREATE TABLE ChampionSpellTooltips(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
 	spellId TEXT REFERENCES ChampionSpells(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	tooltip TEXT,
 );
 
@@ -785,8 +879,8 @@ CREATE TABLE ChampionSpellResources(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
 	spellId TEXT REFERENCES ChampionSpells(id),
-	patch TEXT,
-	languageCode TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	resource TEXT,
 );
 
@@ -795,7 +889,7 @@ CREATE TABLE ChampionSpellResources(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
 	spellId TEXT REFERENCES ChampionSpells(id),
-	patch TEXT,
+	patch TEXT REFERENCES Patches(patch),
 	effectIndex INT,
 	effectBurnValue TEXT,
 );
@@ -805,7 +899,7 @@ CREATE TABLE ChampionSpellLevelTipLabels(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
 	spellId TEXT REFERENCES ChampionSpells(id),
-	patch TEXT,
+	patch TEXT REFERENCES Patches(patch),
 	labelIndex INT,
 	label TEXT
 );
@@ -815,7 +909,7 @@ CREATE TABLE ChampionSpellLevelTipEffects(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
 	spellId TEXT REFERENCES ChampionSpells(id),
-	patch TEXT,
+	patch TEXT REFERENCES Patches(patch),
 	effectIndex INT,
 	effect TEXT
 );
@@ -825,74 +919,315 @@ CREATE TABLE ChampionSpellImages(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(id),
 	spellId TEXT REFERENCES ChampionSpells(id),
-	patch TEXT,
+	patch TEXT REFERENCES Patches(patch),
 	fullURL TEXT,
 	spriteURL TEXT,
-	group TEXT,
 	x INT,
 	y INT, 
 	w INT,
 	h INT,
 );
 
+DROP TABLE IF EXISTS ChampionPassiveNames;
+CREATE TABLE ChampionPassiveNames(
+	auto_id SERIAL PRIMARY KEY,
+	championId INT REFERENCES Champions(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+);
 
+DROP TABLE IF EXISTS ChampionPassiveDescriptions;
+CREATE TABLE ChampionPassiveDescriptions(
+	auto_id SERIAL PRIMARY KEY,
+	championId INT REFERENCES Champions(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	description TEXT,
+);
 
+DROP TABLE IF EXISTS ChampionPassiveImages;
+CREATE TABLE ChampionPassiveImages(
+	auto_id SERIAL PRIMARY KEY,
+	championId INT REFERENCES Champions(id),
+	patch TEXT REFERENCES Patches(patch),
+	fullURL TEXT,
+	spriteURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT,
+);
 
-
-
-
-
-
-
-
+------------------------
 DROP TABLE IF EXISTS Runes;
-CREATE TABLE Runes();
+CREATE TABLE Runes(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	patch REFERENCES Patches(patch),
+	tier INT,
+	type TEXT, -- References rune types? idk just 3ish
+	colloq TEXT, --??
+	plaintext TEXT, --??
+);
+
+DROP TABLE IF EXISTS RuneNames;
+CREATE TABLE RuneNames(
+	auto_id SERIAL PRIMARY KEY,
+	runeId INT REFERENCES Runes(id),
+	patch REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+);
+
+DROP TABLE IF EXISTS RuneDescriptions;
+CREATE TABLE RuneDescriptions(
+	auto_id SERIAL PRIMARY KEY,
+	runeId INT REFERENCES Runes(id),
+	patch REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+);
+
+DROP TABLE IF EXISTS RuneTags;
+CREATE TABLE RuneTags(
+	auto_id SERIAL PRIMARY KEY,
+	runeId INT REFERENCES Runes(id),
+	patch REFERENCES Patches(patch),
+	tag TEXT,
+);
+
+DROP TABLE IF EXISTS RuneStats;
+CREATE TABLE RuneStats(
+	auto_id SERIAL PRIMARY KEY,
+	runeId INT REFERENCES Runes(id),
+	patch REFERENCES Patches(patch),
+	stat TEXT, -- ? Probably a better name for this
+	statValue NUMERIC,
+);
+
+DROP TABLE IF EXISTS RuneImages;
+CREATE TABLE RuneImages(
+	auto_id SERIAL PRIMARY KEY,
+	runeId INT REFERENCES Runes(id),
+	patch REFERENCES Patches(patch),
+	fullURL TEXT,
+	spriteURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT,
+);
 
 DROP TABLE IF EXISTS RunesReforged;
-CREATE TABLE RunesReforged();
+CREATE TABLE RunesReforged(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	key TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	iconURL TEXT,
+);
+
+DROP TABLE IF EXISTS RunesReforgedName;
+CREATE TABLE RunesReforgedName(
+	auto_id SERIAL PRIMARY KEY,
+	runesReforgedId INT REFERENCES RunesReforged(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+);
+
+DROP TABLE IF EXISTS RunesReforgedRunes;
+CREATE TABLE RunesReforgedRunes(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	key TEXT,
+	runesReforgedId INT REFERENCES RunesReforged(id),
+	patch TEXT REFERENCES Patches(patch),
+	slotIndex INT,
+	iconURL TEXT
+);
+
+DROP TABLE IF EXISTS RunesReforgedRuneNames;
+CREATE TABLE RunesReforgedRuneNames(
+	auto_id SERIAL PRIMARY KEY,
+	runesReforgedRuneId INT REFERENCES RunesReforgedRunes(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+);
+
+DROP TABLE IF EXISTS RunesReforgedRuneShortDescriptions;
+CREATE TABLE RunesReforgedRuneShortDescriptions(
+	auto_id SERIAL PRIMARY KEY,
+	runesReforgedRuneId INT REFERENCES RunesReforgedRunes(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	shortDescription TEXT,
+);
+
+DROP TABLE IF EXISTS RunesReforgedRuneLongDescriptions;
+CREATE TABLE RunesReforgedRuneLongDescriptions(
+	auto_id SERIAL PRIMARY KEY,
+	runesReforgedRuneId INT REFERENCES RunesReforgedRunes(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	longDescription TEXT,
+);
 
 DROP TABLE IF EXISTS Masteries;
-CREATE TABLE Masteries();
+CREATE TABLE Masteries(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	patch TEXT REFERENCES Patches(patch),
+	ranks INT,
+	prereq INT REFERENCES Masteries(id),
+	branchName TEXT,
+	columnIndex INT,
+	rowIndex INT,
+);
+
+DROP TABLE IF EXISTS MasteryNames;
+CREATE TABLE MasteryNames(
+	auto_id SERIAL PRIMARY KEY,
+	masteryId INT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+);
+
+DROP TABLE IF EXISTS MasteryDescriptions;
+CREATE TABLE MasteryDescriptions(
+	auto_id SERIAL PRIMARY KEY,
+	masteryId INT,
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	description TEXT,
+	descriptionIndex INT
+);
+
+
+DROP TABLE IF EXISTS MasteryImages;
+CREATE TABLE MasteryImages(
+	auto_id SERIAL PRIMARY KEY,
+	masteryId INT,
+	patch TEXT REFERENCES Patches(patch),
+	fullURL TEXT,
+	spriteURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT,
+);
 
 DROP TABLE IF EXISTS SummonerSpells;
-CREATE TABLE SummonerSpells();
+CREATE TABLE SummonerSpells(
+	auto_id SERIAL PRIMARY KEY,
+	id TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	maxRank INT,
+	cooldownBurn TEXT,
+	costBurn TEXT,
+	summonerLevel INT,
+	costType TEXT,
+	maxAmmo INT,
+	rangeBurn TEXT,
+	resource TEXT, 
+);
+
+DROP TABLE IF EXISTS SummonerSpellNames;
+CREATE TABLE SummonerSpellNames(
+	auto_id SERIAL PRIMARY KEY,
+	summonerId TEXT REFERENCES SummonerSpells(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	name TEXT,
+);
+
+DROP TABLE IF EXISTS SummonerSpellDescriptions;
+CREATE TABLE SummonerSpellDescriptions(
+	auto_id SERIAL PRIMARY KEY,
+	summonerId TEXT REFERENCES SummonerSpells(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	description TEXT,
+);
+
+DROP TABLE IF EXISTS SummonerSpellTooltips;
+CREATE TABLE SummonerSpellTooltips(
+	auto_id SERIAL PRIMARY KEY,
+	summonerId TEXT REFERENCES SummonerSpells(id),
+	patch TEXT REFERENCES Patches(patch),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	tooltip TEXT,
+);
+
+
+DROP TABLE IF EXISTS SummonerSpellModes;
+CREATE TABLE SummonerSpellModes(
+	auto_id SERIAL PRIMARY KEY,
+	summonerId TEXT REFERENCES SummonerSpells(id),
+	patch TEXT REFERENCES Patches(patch),
+	mode TEXT,
+);
+
+DROP TABLE IF EXISTS SummonerSpellImages;
+CREATE TABLE SummonerSpellImages(
+	auto_id SERIAL PRIMARY KEY,
+	summonerId TEXT REFERENCES SummonerSpells(id),
+	patch TEXT REFERENCES Patches(patch),
+	fullURL TEXT,
+	spriteURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT,
+);
 
 DROP TABLE IF EXISTS Maps;
-CREATE TABLE Maps();
+CREATE TABLE Maps(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	patch TEXT REFERENCES Patches(patch),
+	name TEXT,
+	fullURL TEXT,
+	spriteURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT,
+);
+
+DROP TABLE IF EXISTS MapUnpurchasableItems;
+CREATE TABLE MapUnpurchasableItems(
+	auto_id SERIAL PRIMARY KEY,
+	mapId INT REFERENCES Maps(id),
+	patch TEXT REFERENCES Patches(patch),
+	itemId INT REFERENCES Items(id),
+);
 
 DROP TABLE IF EXISTS ProfileIcons;
-CREATE TABLE ProfileIcons();
+CREATE TABLE ProfileIcons(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	patch TEXT REFERENCES Patches(patch),
+	fullURL TEXT,
+	spriteURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT,
+);
 
 DROP TABLE IF EXISTS Stickers;
-CREATE TABLE Stickers();
-
-
-
-
--------------------- THESE ARE EXAMPLES. THEY ARE NOT CORRECT. NEED TO BE UPDATED -------------------------
----------------------------------------------------------------------------------------------------------------------------------------------------------------
-DROP FUNCTION IF EXISTS "addPlayer"(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP);
-CREATE OR REPLACE FUNCTION "addPlayer"(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP)
-	RETURNS INT AS $BODY$
-DECLARE
-	playerId INT;
-BEGIN
-	IF EXISTS(SELECT 1 FROM Players WHERE Players.id=$1) THEN
-		RETURN -1;
-	ELSE
-		INSERT INTO Players (id, firstName, lastName, inGameName, photoURL, region, birthdate) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
-		RETURNING id into Players;
-		RETURN Players;
-	END IF;
-END;
-$BODY$
-  LANGUAGE plpgsql VOLATILE NOT LEAKPROOF;
-
-DROP FUNCTION IF EXISTS "getSpecificPlayer"(id INT);
-CREATE OR REPLACE FUNCTION "getSpecificPlayer"(id INT) 
-RETURNS TABLE(id INT, firstName TEXT, lastName TEXT, inGameName TEXT, photoURL TEXT, region INT, birthdate TIMESTAMP) AS $$
-		SELECT id, firstName, lastName, inGameName, photoURL, region, birthdate, birthdate
-		FROM Players
-		WHERE id=$1
-$$ LANGUAGE sql VOLATILE NOT LEAKPROOF;
+CREATE TABLE Stickers(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	patch TEXT REFERENCES Patches(patch),
+	fullURL TEXT,
+	spriteURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT,
+);
