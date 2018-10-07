@@ -381,6 +381,21 @@ CREATE TABLE GameStatTeamBans(
 	pickTurn INT
 );
 
+DROP TABLE IF EXISTS SummonerSpells;
+CREATE TABLE SummonerSpells(
+	auto_id SERIAL PRIMARY KEY,
+	id TEXT,
+	patch TEXT REFERENCES Patches(patch),
+	maxRank INT,
+	cooldownBurn TEXT,
+	costBurn TEXT,
+	summonerLevel INT,
+	costType TEXT,
+	maxAmmo INT,
+	rangeBurn TEXT,
+	resource TEXT, 
+);
+
 DROP TABLE IF EXISTS GameStatsParticipants;
 CREATE TABLE GameStatsParticipants(
 	auto_id SERIAL PRIMARY KEY,
@@ -390,155 +405,43 @@ CREATE TABLE GameStatsParticipants(
 	profileIcon INT,
 	teamId INT,
 	championId INT REFERENCES Champions(auto_id),
-	spell1Id INT REFERENCES SummonerSpells(id),
-	spell2Id INT REFERENCES SummonerSpells(id),
-	...
+	spell1Id INT REFERENCES SummonerSpells(auto_id),
+	spell2Id INT REFERENCES SummonerSpells(auto_id)
 );
 
 DROP TABLE IF EXISTS GameTimelines;
 CREATE TABLE GameTimelines(
 	auto_id SERIAL,
 	gameId TEXT PRIMARY KEY REFERENCES Games(id),
-	frameInterval INT,
+	frameInterval INT
 );
-
-DROP TABLE IF EXISTS GameTimelineFrameEventWardPlaced;
-CREATE TABLE GameTimelineFrameEventWardPlaced(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	wardType TEXT REFERENCES GameTimelineFrameEventWardTypes(wardType),
-	creatorId INT REFERENCES ...., (participantId),
-);
-
-DROP TABLE IF EXISTS GameTimelineFrameEventWardKill;
-CREATE TABLE GameTimelineFrameEventWardKill(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	wardType TEXT REFERENCES GameTimelineFrameEventWardTypes(wardType),
-	killerId INT REFERENCES ...., (participantId),
-);
-
-DROP TABLE IF EXISTS GameTimelineFrameEventItemPurchased;
-CREATE TABLE GameTimelineFrameEventItemPurchased(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	itemId TEXT REFERENCES Items(id),
-	participantId INT REFERENCES ...., (participantId),
-);
-
-DROP TABLE IF EXISTS GameTimelineFrameEventItemSold;
-CREATE TABLE GameTimelineFrameEventItemSold(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	itemId TEXT REFERENCES Items(id),
-	participantId INT REFERENCES ...., (participantId),
-);
-
-DROP TABLE IF EXISTS GameTimelineFrameEventItemDestroyed;
-CREATE TABLE GameTimelineFrameEventItemDestroyed(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	itemId TEXT REFERENCES Items(id),
-	participantId INT REFERENCES ...., (participantId),
-);
-
-DROP TABLE IF EXISTS GameTimelineFrameEventSkillLevelUp;
-CREATE TABLE GameTimelineFrameEventSkillLevelUp(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	skillSlot INT,
-	participantId INT REFERENCES ...., (participantId),
-	levelUpType TEXT,
-);
-
-DROP TABLE IF EXISTS GameTimelineFrameEventBuildingKill;
-CREATE TABLE GameTimelineFrameEventBuildingKill(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	xPosition INT,
-	yPosition INT,
-	killerId INT REFERENCES ...., (participantId),
-	teamId INT,
-	buildingType TEXT,
-	laneType TEXT,
-	towerType TEXT,
-	-- assistingParticipantsId -- Make new table
-);
-
-DROP TABLE IF EXISTS GameTimelineFrameEventChampionKill;
-CREATE TABLE GameTimelineFrameEventChampionKill(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	xPosition INT,
-	yPosition INT,
-	killerId INT REFERENCES ...., (participantId),
-	victimId INT REFERENCES ...., (participantId),
-	-- assistingParticipantsId -- Make new table
-);
-
-DROP TABLE IF EXISTS GameTimelineFrameEventEliteMonsterKill;
-CREATE TABLE GameTimelineFrameEventEliteMonsterKill(
-	auto_id SERIAL PRIMARY KEY,
-	gameId TEXT REFERENCES Games(id),
-	type TEXT,
-	_timestamp INT,
-	xPosition INT,
-	yPosition INT,
-	killerId INT REFERENCES ...., (participantId),
-	monsterType TEXT,
-	monsterSubType TEXT,
-	-- assistingParticipantsId -- Make new table?????????
-);
-
 
 DROP TABLE IF EXISTS GameTimelineFrameEventEliteMonsterTypes;
 CREATE TABLE GameTimelineFrameEventEliteMonsterTypes(
 	auto_id SERIAL,
-	monsterType TEXT PRIMARY KEY,
-);
+	monsterType TEXT PRIMARY KEY);
 
 DROP TABLE IF EXISTS GameTimelineFrameEventEliteMonsterSubTypes;
 CREATE TABLE GameTimelineFrameEventEliteMonsterSubTypes(
 	auto_id SERIAL,
-	monsterSubType TEXT PRIMARY KEY,
-);
-
+	monsterSubType TEXT PRIMARY KEY);
 
 DROP TABLE IF EXISTS GameTimelineFrameEventTypes;
 CREATE TABLE GameTimelineFrameEventTypes(
 	auto_id SERIAL,
-	type TEXT PRIMARY KEY,
-);
+	type TEXT PRIMARY KEY);
 
 DROP TABLE IF EXISTS GameTimelineFrameEventWardTypes;
 CREATE TABLE GameTimelineFrameEventWardTypes(
 	auto_id SERIAL,
-	wardType TEXT PRIMARY KEY,
-);
+	wardType TEXT PRIMARY KEY);
 
 DROP TABLE IF EXISTS GameTimelineFrameEvents;
 CREATE TABLE GameTimelineFrameEvents(
 	auto_id SERIAL PRIMARY KEY,
 	gameId TEXT REFERENCES Games(id),
 	type TEXT REFERENCES GameTimelineFrameEventTypes(type),
-	_timestamp INT,
-);
+	_timestamp INT);
 
 DROP TABLE IF EXISTS GameTimelineFrameParticipantFrames;
 CREATE TABLE GameTimelineFrameParticipantFrames(
@@ -555,8 +458,7 @@ CREATE TABLE GameTimelineFrameParticipantFrames(
 	jungleMinionsKilled INT,
 	dominionScore INT,
 	teamScore INT,
-	_timestamp INT,
-);
+	_timestamp INT);
 
 DROP TABLE IF EXISTS Videos;
 CREATE TABLE Videos(
@@ -566,12 +468,10 @@ CREATE TABLE Videos(
 	gameId TEXT REFERENCES Games(id),
 	matchId TEXT REFERENCES Matches(id),
 	url TEXT,
-	locale TEXT, -- languageCode TEXT REFERENCES LanguageCodes(languageCode)
+	locale TEXT -- languageCode TEXT REFERENCES LanguageCodes(languageCode)
 );
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------- STATIC DATA ------------------------------------------------------------------------------------------------------------------------------
-
-
 
 DROP TABLE IF EXISTS Items;
 CREATE TABLE Items(
@@ -584,68 +484,63 @@ CREATE TABLE Items(
 	purchasable BOOLEAN,
 	totalGold INT,
 	sellGold INT,
-	hideFromAll BOOLEAN,
-	specialRecipie INT REFERENCES .... (id)
+	hideFromAll BOOLEAN
+	--specialRecipie INT REFERENCES .... (id)
 );
 
 DROP TABLE IF EXISTS ItemNames;
 CREATE TABLE ItemNames(
 	auto_id SERIAL PRIMARY KEY,
-	itemId INT REFERENCES Items(id),
+	itemId TEXT REFERENCES Items(patch),
 	patch TEXT REFERENCES Patches(patch),
 	anguageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT,
+	name TEXT
 );
 
 DROP TABLE IF EXISTS ItemDescriptions;
 CREATE TABLE ItemDescriptions(
 	auto_id SERIAL PRIMARY KEY,
-	itemId INT REFERENCES Items(id),
+	itemId TEXT REFERENCES Items(patch),
 	patch TEXT REFERENCES Patches(patch),
 	anguageCode TEXT REFERENCES LanguageCodes(languageCode),
-	description TEXT,
-);
+	description TEXT);
 
 DROP TABLE IF EXISTS ItemPlaintexts;
 CREATE TABLE ItemPlaintexts(
 	auto_id SERIAL PRIMARY KEY,
-	itemId INT REFERENCES Items(id),
+	itemId TEXT REFERENCES Items(patch),
 	patch TEXT REFERENCES Patches(patch),
 	anguageCode TEXT REFERENCES LanguageCodes(languageCode),
-	plaintext TEXT,
-);
+	plaintext TEXT);
 
 DROP TABLE IF EXISTS ItemTags;
 CREATE TABLE ItemTags(
 	auto_id SERIAL PRIMARY KEY,
-	itemId INT REFERENCES Items(id),
-	patch TEXT REFERENCES Items(patch),
-	tag TEXT,
-);
+	itemId TEXT REFERENCES Items(patch),
+	patch TEXT REFERENCES Patches(patch),
+	tag TEXT);
 
 DROP TABLE IF EXISTS ItemEffects;
 CREATE TABLE ItemEffects(
 	auto_id SERIAL PRIMARY KEY,
-	itemId INT REFERENCES Items(id),
-	patch TEXT REFERENCES Items(patch),
+	itemId TEXT REFERENCES Items(patch),
+	patch TEXT REFERENCES Patches(patch),
 	effectIndex INT,
-	effectValue INT,
-);
+	effectValue INT);
 
 DROP TABLE IF EXISTS ItemMaps;
 CREATE TABLE ItemMaps(
 	auto_id SERIAL PRIMARY KEY,
-	itemId INT REFERENCES Items(id),
-	patch TEXT REFERENCES Items(patch),
-	mapId INT REFERENCES Maps(id),
-);
+	itemId TEXT REFERENCES Items(patch),
+	patch TEXT REFERENCES Patches(patch),
+	mapId INT REFERENCES Maps(auto_id));
 
 DROP TABLE IF EXISTS ItemStats;
 CREATE TABLE ItemStats(
 	auto_id SERIAL PRIMARY KEY,
 	itemId INT REFERENCES Items(id),
 	patch TEXT REFERENCES Items(patch),
-	statId INT REFERENCES I.....(id),
+	--statId INT REFERENCES I.....(id),
 );
 
 DROP TABLE IF EXISTS ItemBuildIntos;
@@ -1113,20 +1008,7 @@ CREATE TABLE MasteryImages(
 	h INT,
 );
 
-DROP TABLE IF EXISTS SummonerSpells;
-CREATE TABLE SummonerSpells(
-	auto_id SERIAL PRIMARY KEY,
-	id TEXT,
-	patch TEXT REFERENCES Patches(patch),
-	maxRank INT,
-	cooldownBurn TEXT,
-	costBurn TEXT,
-	summonerLevel INT,
-	costType TEXT,
-	maxAmmo INT,
-	rangeBurn TEXT,
-	resource TEXT, 
-);
+
 
 DROP TABLE IF EXISTS SummonerSpellNames;
 CREATE TABLE SummonerSpellNames(
@@ -1211,4 +1093,108 @@ CREATE TABLE Stickers(
 	y INT,
 	w INT,
 	h INT,
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventWardPlaced;
+CREATE TABLE GameTimelineFrameEventWardPlaced(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	wardType TEXT REFERENCES GameTimelineFrameEventWardTypes(wardType),
+	creatorId INT REFERENCES ...., (participantId), --needs to be fixed
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventWardKill;
+CREATE TABLE GameTimelineFrameEventWardKill(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	wardType TEXT REFERENCES GameTimelineFrameEventWardTypes(wardType),
+	killerId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventItemPurchased;
+CREATE TABLE GameTimelineFrameEventItemPurchased(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	itemId TEXT REFERENCES Items(id),
+	participantId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventItemSold;
+CREATE TABLE GameTimelineFrameEventItemSold(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	itemId TEXT REFERENCES Items(id),
+	participantId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventItemDestroyed;
+CREATE TABLE GameTimelineFrameEventItemDestroyed(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	itemId TEXT REFERENCES Items(id),
+	participantId INT REFERENCES ...., (participantId),
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventSkillLevelUp;
+CREATE TABLE GameTimelineFrameEventSkillLevelUp(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	skillSlot INT,
+	participantId INT REFERENCES ...., (participantId),
+	levelUpType TEXT,
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventBuildingKill;
+CREATE TABLE GameTimelineFrameEventBuildingKill(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	xPosition INT,
+	yPosition INT,
+	killerId INT REFERENCES ...., (participantId),
+	teamId INT,
+	buildingType TEXT,
+	laneType TEXT,
+	towerType TEXT,
+	-- assistingParticipantsId -- Make new table
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventChampionKill;
+CREATE TABLE GameTimelineFrameEventChampionKill(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	xPosition INT,
+	yPosition INT,
+	killerId INT REFERENCES ...., (participantId),
+	victimId INT REFERENCES ...., (participantId),
+	-- assistingParticipantsId -- Make new table
+);
+
+DROP TABLE IF EXISTS GameTimelineFrameEventEliteMonsterKill;
+CREATE TABLE GameTimelineFrameEventEliteMonsterKill(
+	auto_id SERIAL PRIMARY KEY,
+	gameId TEXT REFERENCES Games(id),
+	type TEXT,
+	_timestamp INT,
+	xPosition INT,
+	yPosition INT,
+	killerId INT REFERENCES ...., (participantId),
+	monsterType TEXT,
+	monsterSubType TEXT,
+	-- assistingParticipantsId -- Make new table?????????
 );
