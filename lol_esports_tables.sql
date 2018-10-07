@@ -7,24 +7,14 @@ CREATE TABLE Players(
 	photoURL TEXT,
 	hometown TEXT,
 	region INT,
-	birthdate TIMESTAMP WITH TIME ZONE,
-);
-
-DROP TABLE IF EXISTS PlayerBios;
-CREATE TABLE PlayerBios (
-	auto_id SERIAL PRIMARY KEY,
-	playerId INT REFERENCES Players(id),
-	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	bio TEXT
-);
+	birthdate TIMESTAMP WITH TIME ZONE);
 
 DROP TABLE IF EXISTS PlayerSocialNetworks;
 CREATE TABLE PlayerSocialNetworks (
 	auto_id SERIAL PRIMARY KEY,
 	playerId INT REFERENCES Players(id),
 	networkName TEXT,
-	url TEXT
-);
+	url TEXT);
 
 DROP TABLE IF EXISTS PlayerStatsSummaries;
 CREATE TABLE PlayerStatsSummaries(
@@ -36,19 +26,49 @@ CREATE TABLE PlayerStatsSummaries(
 	csPerTenMinutesRank INT,
 	killParticipation NUMERIC,
 	killParticipationRank INT,
-	mostPlayedChampionsId TEXT,
+	mostPlayedChampionsId TEXT
 );
 
+DROP TABLE IF EXISTS LanguageCodes;
+CREATE TABLE LanguageCodes(
+	auto_id SERIAL,
+	languageCode TEXT PRIMARY KEY,
+	language TEXT);
+
+DROP TABLE IF EXISTS Languages; --- Better name
+CREATE TABLE Languages(
+	auto_id SERIAL PRIMARY KEY,
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	language TEXT);
+
+DROP TABLE IF EXISTS PlayerBios;
+CREATE TABLE PlayerBios (
+	auto_id SERIAL PRIMARY KEY,
+	playerId INT REFERENCES Players(id),
+	languageCode TEXT REFERENCES LanguageCodes(languageCode),
+	bio TEXT);
+
+DROP TABLE IF EXISTS Patches;
+CREATE TABLE Patches(
+	auto_id SERIAL,
+	patch TEXT PRIMARY KEY);
+
+DROP TABLE IF EXISTS Champions;
+CREATE TABLE Champions(
+	auto_id SERIAL PRIMARY KEY,
+	patch TEXT REFERENCES Patches (patch),
+	id INT,
+	parType TEXT);
+	
 DROP TABLE IF EXISTS PlayerStatsSummariesMostPlayedChampions;
 CREATE TABLE PlayerStatsSummariesMostPlayedChampions(
 	auto_id SERIAL PRIMARY KEY,
 	playerStatsSummaryId INT REFERENCES PlayerStatsSummaries(id),
-	championId REFERENCES Champions(id),
+	championId INT REFERENCES Champions (auto_id),
 	wins INT,
 	losses INT,
 	total INT,
-	kdaRatioRank NUMERIC
-);
+	kdaRatioRank NUMERIC);
 
 DROP TABLE IF EXISTS PlayerTournamentStats;
 CREATE TABLE PlayerTournamentStats(
@@ -66,8 +86,26 @@ CREATE TABLE PlayerTournamentStats(
 	killParticipation NUMERIC,
 	csPerMin NUMERIC,
 	cs INT,
-	minutesPlayed INT
-);
+	minutesPlayed INT);
+
+DROP TABLE IF EXISTS Leagues;
+CREATE TABLE Leagues(
+	auto_id SERIAL,
+	id INT PRIMARY KEY,
+	guid TEXT,
+	name TEXT,
+	logoURL TEXT);
+
+DROP TABLE IF EXISTS Team;
+CREATE TABLE Teams(
+ 	auto_id SERIAL,
+ 	id INT PRIMARY KEY,
+ 	name TEXT,
+ 	photoURL TEXT,
+ 	logoURL TEXT,
+ 	acronym TEXT,
+  	altLogoURL TEXT,
+  	homeLeague INT REFERENCES Leagues(id));
 
 DROP TABLE IF EXISTS TeamStatsSummaries;
 CREATE TABLE TeamStatsSummaries(
@@ -80,8 +118,7 @@ CREATE TABLE TeamStatsSummaries(
 	firstDragonKillRatio NUMERIC,
 	firstDragonKillRatioRank INT,
 	firstTowerRatio NUMERIC,
-	firstTowerRatioRank INT,
-);
+	firstTowerRatioRank INT);
 
 -- Percetage
 DROP TABLE IF EXISTS TeamStatsSummariesAverageDamageByPositions;
@@ -91,8 +128,7 @@ CREATE TABLE TeamStatsSummariesAverageDamageByPositions(
 	adc NUMERIC,
 	support NUMERIC,
 	solo NUMERIC,
-	jungle NUMERIC,
-);
+	jungle NUMERIC);
 
 DROP TABLE IF EXISTS TeamRosterStats;
 CREATE TABLE TeamRosterStats(
@@ -104,49 +140,52 @@ CREATE TABLE TeamRosterStats(
 	averageDeaths NUMERIC,
 	averageKills NUMERIC,
 	averageKillParticipation NUMERIC,
-	summonerName TEXT
-);
+	summonerName TEXT);
 
 DROP TABLE IF EXISTS TeamRosterStatsChampions;
 CREATE TABLE TeamRosterStatsChampions(
 	auto_id SERIAL PRIMARY KEY,
 	teamId INT REFERENCES Teams(id),
 	playerId INT REFERENCES Players(id),
-	championId INT REFERENCES Champions(id)
-);
+	championId INT REFERENCES Champions(auto_id));
 
-DROP TABLE IF EXISTS TeamStatsHistories;
-CREATE TABLE TeamStatsHistories(
+DROP TABLE IF EXISTS Tournaments;
+CREATE TABLE Tournaments(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
-	_timestamp NUMERIC,
-	assists INT,
-	deaths INT,
-	kills INT,
-	win BOOLEAN,
-	matchId TEXT REFERENCES Matches(id),
-	teamId INT REFERENCES Teams(id),
-	opponentTeamId INT REFERENCES Teams(id),
-	gameId TEXT REFERENCES Games(id)
+	title TEXT,
+	description TEXT,
+	leagueId INT REFERENCES Leagues(id));
+
+DROP TABLE IF EXISTS TournamentTeams;
+CREATE TABLE TournamentTeams(
+	auto_id SERIAL,
+	id TEXT PRIMARY KEY,
+	name TEXT, -- Acronym
+	teamId INT REFERENCES Teams(id)
 );
+
+DROP TABLE IF EXISTS TournamentBrackets;
+CREATE TABLE TournamentBrackets(
+	auto_id SERIAL,
+	id TEXT PRIMARY KEY,
+	name TEXT,
+	groupPosition INT,
+	groupName TEXT);
+
+DROP TABLE IF EXISTS TournamentBracketTypes;
+CREATE TABLE TournamentBracketTypes(
+	auto_id SERIAL PRIMARY KEY,
+	tournamentId TEXT REFERENCES Tournaments(id),
+	bracketId TEXT REFERENCES TournamentBrackets(id),
+	type TEXT,
+	rounds INT);
 
 DROP TABLE IF EXISTS TeamStatsHistoriesChampions;
 CREATE TABLE TeamStatsHistoriesChampions(
 	auto_id SERIAL PRIMARY KEY,
 	teamStatsHistoriesId TEXT REFERENCES TeamStatsHistories(id),
-	championId INT REFERENCES Champions(id)
-);
-
-DROP TABLE IF EXISTS Team;
-CREATE TABLE Teams(
- 	auto_id SERIAL,
- 	id INT PRIMARY KEY,
- 	name TEXT,
- 	photoURL TEXT,
- 	logoURL TEXT,
- 	acronym TEXT,
-  	altLogoURL TEXT,
-  	homeLeague INT REFERENCES Leagues(id)
+	championId INT REFERENCES Champions(auto_id)
 );
 
 DROP TABLE IF EXISTS TeamBios;
@@ -178,77 +217,13 @@ CREATE TABLE TeamPlayers(
  	playerId INT REFERENCES Players(id)
 );
 
-DROP TABLE IF EXISTS PlayerStatsHistories;
-CREATE TABLE PlayerStatsHistories(
-	auto_id SERIAL;
-	id TEXT PRIMARY KEY,
-	playerId INT REFERENCES Players(id),
-	championId INT REFERENCES Champions(id),
-	_timestamp NUMERIC,
-	assists INT,
-	deaths INT,
-	kills INT,
-	csPerTenMinutes NUMERIC,
-	kdaRatio NUMERIC,
-	killParticipation INT,
-	win BOOLEAN,
-	matchId TEXT Matches(id),
-	teamId INT REFERENCES Teams(id),
-	opponentTeamId INT REFERENCES Teams(id),
-	gameId TEXT REFERENCES Games(id),
-);
-
-DROP TABLE IF EXISTS Tournaments;
-CREATE TABLE Tournaments(
-	auto_id SERIAL,
-	id TEXT PRIMARY KEY,
-	title TEXT,
-	description TEXT,
-	leagueId INT REFERENCES Leagues(id),
-);
-
-DROP TABLE IF EXISTS TournamentTeams;
-CREATE TABLE TournamentTeams(
-	auto_id SERIAL,
-	id TEXT PRIMARY KEY,
-	name TEXT, -- Acronym
-	teamId INT REFERENCES Teams(id)
-);
-
-DROP TABLE IF EXISTS TournamentBrackets;
-CREATE TABLE TournamentBrackets(
-	auto_id SERIAL,
-	id TEXT PRIMARY KEY,
-	name TEXT,
-	groupPosition INT,
-	groupName TEXT,
-
-);
-
-DROP TABLE IF EXISTS TournamentBracketTypes;
-CREATE TABLE TournamentBracketTypes(
-	auto_id SERIAL PRIMARY KEY,
-	tournamentId TEXT REFERENCES Tournaments(id),
-	bracketId TEXT REFERENCES TournamentBrackets(id),
-	type TEXT,
-	rounds INT,
-);
-
 DROP TABLE IF EXISTS TournamentBracketMatchTypes
 CREATE TABLE TournamentBracketMatchTypes(
 	auto_id SERIAL PRIMARY KEY,
 	tournamentId TEXT REFERENCES Tournaments(id),
 	bracketId TEXT REFERENCES TournamentBrackets(id),
 	type TEXT,
-	bestOf INT,
-);
-
-DROP TABLE IF EXISTS TournamentBracketRosters;
-CREATE TABLE TournamentBracketRosters(
-	auto_id SERIAL PRIMARY KEY,
-	tournamentId TEXT REFERENCES Tournaments(id),
-	bracketId TEXT REFERENCES TournamentBrackets(id),
-	roster TEXT REFERENCES TournamentRosters(id),
+	bestOf INT
 );
 
 DROP TABLE IF EXISTS TournamentRosters;
@@ -260,10 +235,18 @@ CREATE TABLE TournamentRosters(
 	tournamentId TEXT REFERENCES Tournaments(id)
 );
 
+DROP TABLE IF EXISTS TournamentBracketRosters;
+CREATE TABLE TournamentBracketRosters(
+	auto_id SERIAL PRIMARY KEY,
+	tournamentId TEXT REFERENCES Tournaments(id),
+	bracketId TEXT REFERENCES TournamentBrackets(id),
+	roster TEXT REFERENCES TournamentRosters(id)
+);
+
 DROP TABLE IF EXISTS LeagueAbouts;
 CREATE TABLE LeagueAbouts(
 	auto_id SERIAL PRIMARY KEY,
-	leagueId INT REFERENCES Leauges(id),
+	leagueId INT REFERENCES Leagues(id),
  	languageCode TEXT REFERENCES LanguageCodes(languageCode),
  	about TEXT
 );
@@ -271,7 +254,7 @@ CREATE TABLE LeagueAbouts(
 DROP TABLE IF EXISTS LeagueNames;
 CREATE TABLE LeagueNames(
 	auto_id SERIAL PRIMARY KEY,
-	leagueId INT REFERENCES Leauges(id),
+	leagueId INT REFERENCES Leagues(id),
  	languageCode TEXT REFERENCES LanguageCodes(languageCode),
  	name TEXT
 );
@@ -289,15 +272,6 @@ CREATE TABLE LeagueTournamentRecords(
 	score INT
 );
 
-DROP TABLE IF EXISTS Leagues;
-CREATE TABLE Leagues(
-	auto_id SERIAL,
-	id INT PRIMARY KEY,
-	guid TEXT,
-	name TEXT,
-	logoURL TEXT,
-);
-
 DROP TABLE IF EXISTS Matches;
 CREATE TABLE Matches(
 	auto_id SERIAL,
@@ -305,9 +279,27 @@ CREATE TABLE Matches(
 	tournamentId TEXT REFERENCES Tournaments(id),
 	bracketId TEXT REFERENCES TournamentBrackets(id),
 	name TEXT,
-	position INT,
-
+	position INT
 );
+
+DROP TABLE IF EXISTS PlayerStatsHistories;
+CREATE TABLE PlayerStatsHistories(
+	auto_id SERIAL,
+	id TEXT PRIMARY KEY,
+	playerId INT REFERENCES Players(id),
+	championId INT REFERENCES Champions(auto_id),
+	_timestamp NUMERIC,
+	assists INT,
+	deaths INT,
+	kills INT,
+	csPerTenMinutes NUMERIC,
+	kdaRatio NUMERIC,
+	killParticipation INT,
+	win BOOLEAN,
+	matchId TEXT REFERENCES Matches(id),
+	teamId INT REFERENCES Teams(id),
+	opponentTeamId INT REFERENCES Teams(id),
+	gameId TEXT REFERENCES Games(id));
 
 DROP TABLE IF EXISTS Games;
 CREATE TABLE Games(
@@ -316,8 +308,35 @@ CREATE TABLE Games(
 	matchId TEXT REFERENCES Matches(id),
 	bracketId TEXT REFERENCES TournamentBrackets(id),
 	tournamentId TEXT REFERENCES Tournaments(id),
-	name TEXT,
+	name TEXT);
+
+DROP TABLE IF EXISTS TeamStatsHistories;
+CREATE TABLE TeamStatsHistories(
+	auto_id SERIAL,
+	id TEXT PRIMARY KEY,
+	_timestamp NUMERIC,
+	assists INT,
+	deaths INT,
+	kills INT,
+	win BOOLEAN,
+	matchId TEXT REFERENCES Matches(id),
+	teamId INT REFERENCES Teams(id),
+	opponentTeamId INT REFERENCES Teams(id),
+	gameId TEXT REFERENCES Games(id)
 );
+
+DROP TABLE IF EXISTS Maps;
+CREATE TABLE Maps(
+	auto_id SERIAL PRIMARY KEY,
+	id INT,
+	patch TEXT REFERENCES Patches(patch),
+	name TEXT,
+	fullURL TEXT,
+	spriteURL TEXT,
+	x INT,
+	y INT,
+	w INT,
+	h INT);
 
 DROP TABLE IF EXISTS GameStats;
 CREATE TABLE GameStats(
@@ -326,7 +345,7 @@ CREATE TABLE GameStats(
 	platformId TEXT,
 	gameCreation NUMERIC,
 	gameDuration INT,
-	mapId INT REFERENCES Maps(id),
+	mapId INT REFERENCES Maps(auto_id),
 	seasonId INT,
 	gameVersion TEXT, -- relates to patch #
 	gameMode TEXT, -- create game mode type table, ref it
@@ -350,16 +369,16 @@ CREATE TABLE GameStatTeams(
 	dragonKills INT,
 	vilemawKills INT,
 	riftHeraldKills INT,
-	dominionVictoryScore INT,
+	dominionVictoryScore INT
 );
 
 DROP TABLE IF EXISTS GameStatTeamBans;
 CREATE TABLE GameStatTeamBans(
 	auto_id SERIAL PRIMARY KEY,
 	gameId TEXT REFERENCES Games(id),
-	teamId INT REFERENCES GameStatTeams(teamId),
-	championId INT REFERENCES Champions(id),
-	pickTurn INT,
+	teamId INT REFERENCES GameStatTeams(auto_id),
+	championId INT REFERENCES Champions(auto_id),
+	pickTurn INT
 );
 
 DROP TABLE IF EXISTS GameStatsParticipants;
@@ -370,7 +389,7 @@ CREATE TABLE GameStatsParticipants(
 	summonerName TEXT,
 	profileIcon INT,
 	teamId INT,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	spell1Id INT REFERENCES SummonerSpells(id),
 	spell2Id INT REFERENCES SummonerSpells(id),
 	...
@@ -551,32 +570,15 @@ CREATE TABLE Videos(
 );
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------- STATIC DATA ------------------------------------------------------------------------------------------------------------------------------
-DROP TABLE IF EXISTS LanguageCodes;
-CREATE TABLE LanguageCodes(
-	auto_id SERIAL,
-	languageCode TEXT PRIMARY KEY,
-	language TEXT,
-);
 
-DROP TABLE IF EXISTS Languages; --- Better name
-CREATE TABLE Languages(
-	auto_id SERIAL PRIMARY KEY,
-	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	language TEXT,
-);
 
-DROP TABLE IF EXISTS Patches;
-CREATE TABLE Patches(
-	auto_id SERIAL,
-	patch TEXT PRIMARY KEY,
-);
 
 DROP TABLE IF EXISTS Items;
 CREATE TABLE Items(
 	auto_id SERIAL,
 	patch TEXT PRIMARY KEY,
 	id INT,
-	requiredChampion INT REFERENCES Champions(id),
+	requiredChampion INT REFERENCES Champions(auto_id),
 	inStore BOOLEAN,
 	baseGold INT,
 	purchasable BOOLEAN,
@@ -675,19 +677,10 @@ CREATE TABLE ItemImages(
 	h INT,
 );
 
-DROP TABLE IF EXISTS Champions;
-CREATE TABLE Champions(
-	auto_id SERIAL PRIMARY KEY,
-	patch TEXT REFERENCES Patches(patch),
-	id INT,
-	parType TEXT,
-
-);
-
 DROP TABLE IF EXISTS ChampionNames;
 CREATE TABLE ChampionNames(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	name TEXT,
@@ -696,7 +689,7 @@ CREATE TABLE ChampionNames(
 DROP TABLE IF EXISTS ChampionTitles;
 CREATE TABLE ChampionTitles(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	title TEXT,
@@ -705,7 +698,7 @@ CREATE TABLE ChampionTitles(
 DROP TABLE IF EXISTS ChampionLores;
 CREATE TABLE ChampionLores(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	lore TEXT,
@@ -714,7 +707,7 @@ CREATE TABLE ChampionLores(
 DROP TABLE IF EXISTS ChampionBlurbs;
 CREATE TABLE ChampionBlurbs(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	blurb TEXT,
@@ -731,7 +724,7 @@ CREATE TABLE ChampionAllyTips(
 DROP TABLE IF EXISTS ChampionEnemyTips;
 CREATE TABLE ChampionEnemyTips(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	tip TEXT,
@@ -740,7 +733,7 @@ CREATE TABLE ChampionEnemyTips(
 DROP TABLE IF EXISTS ChampionInfos;
 CREATE TABLE ChampionInfos(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	attack INT,
 	defense INT,
@@ -751,7 +744,7 @@ CREATE TABLE ChampionInfos(
 DROP TABLE IF EXISTS ChampionTags;
 CREATE TABLE ChampionTags(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch)
 	tag TEXT,
 );
@@ -759,7 +752,7 @@ CREATE TABLE ChampionTags(
 DROP TABLE IF EXISTS ChampionStats;
 CREATE TABLE ChampionStats(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch)
 	hp INT,
 	hpPerLevel INT,
@@ -796,7 +789,7 @@ CREATE TABLE ChampionSkins(
 DROP TABLE IF EXISTS ChampionSquareImages;
 CREATE TABLE ChampionSquareImages(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	imageURL TEXT,
 );
@@ -804,7 +797,7 @@ CREATE TABLE ChampionSquareImages(
 DROP TABLE IF EXISTS ChampionSplashImages;
 CREATE TABLE ChampionSplashImages(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	skinId INT REFERENCES ChampionSkins(id),
 	imageURL TEXT,
@@ -813,7 +806,7 @@ CREATE TABLE ChampionSplashImages(
 DROP TABLE IF EXISTS ChampionLoadingImages;
 CREATE TABLE ChampionLoadingImages(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	skinId INT REFERENCES ChampionSkins(id),
 	imageURL TEXT,
@@ -822,7 +815,7 @@ CREATE TABLE ChampionLoadingImages(
 DROP TABLE IF EXISTS ChampionSprites;
 CREATE TABLE ChampionLoadingImages(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	imageURL TEXT,
 	x INT,
@@ -835,7 +828,7 @@ DROP TABLE IF EXISTS ChampionSpells;
 CREATE TABLE ChampionSpells(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	cooldownBurn TEXT,
 	costBurn TEXT,
@@ -848,7 +841,7 @@ CREATE TABLE ChampionSpells(
 DROP TABLE IF EXISTS ChampionSpellNames;
 CREATE TABLE ChampionSpellNames(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	spellId TEXT REFERENCES ChampionSpells(id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
@@ -858,7 +851,7 @@ CREATE TABLE ChampionSpellNames(
 DROP TABLE IF EXISTS ChampionSpellDescriptions;
 CREATE TABLE ChampionSpellDescriptions(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	description TEXT,
@@ -867,7 +860,7 @@ CREATE TABLE ChampionSpellDescriptions(
 DROP TABLE IF EXISTS ChampionSpellTooltips;
 CREATE TABLE ChampionSpellTooltips(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	spellId TEXT REFERENCES ChampionSpells(id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
@@ -877,7 +870,7 @@ CREATE TABLE ChampionSpellTooltips(
 DROP TABLE IF EXISTS ChampionSpellResources;
 CREATE TABLE ChampionSpellResources(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	spellId TEXT REFERENCES ChampionSpells(id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
@@ -887,7 +880,7 @@ CREATE TABLE ChampionSpellResources(
 DROP TABLE IF EXISTS ChampionSpellEffects;
 CREATE TABLE ChampionSpellResources(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	spellId TEXT REFERENCES ChampionSpells(id),
 	patch TEXT REFERENCES Patches(patch),
 	effectIndex INT,
@@ -897,7 +890,7 @@ CREATE TABLE ChampionSpellResources(
 DROP TABLE IF EXISTS ChampionSpellLevelTipLabels;
 CREATE TABLE ChampionSpellLevelTipLabels(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	spellId TEXT REFERENCES ChampionSpells(id),
 	patch TEXT REFERENCES Patches(patch),
 	labelIndex INT,
@@ -907,7 +900,7 @@ CREATE TABLE ChampionSpellLevelTipLabels(
 DROP TABLE IF EXISTS ChampionSpellLevelTipEffects;
 CREATE TABLE ChampionSpellLevelTipEffects(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	spellId TEXT REFERENCES ChampionSpells(id),
 	patch TEXT REFERENCES Patches(patch),
 	effectIndex INT,
@@ -917,7 +910,7 @@ CREATE TABLE ChampionSpellLevelTipEffects(
 DROP TABLE IF EXISTS ChampionSpellImages;
 CREATE TABLE ChampionSpellImages(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	spellId TEXT REFERENCES ChampionSpells(id),
 	patch TEXT REFERENCES Patches(patch),
 	fullURL TEXT,
@@ -931,7 +924,7 @@ CREATE TABLE ChampionSpellImages(
 DROP TABLE IF EXISTS ChampionPassiveNames;
 CREATE TABLE ChampionPassiveNames(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	name TEXT,
@@ -940,7 +933,7 @@ CREATE TABLE ChampionPassiveNames(
 DROP TABLE IF EXISTS ChampionPassiveDescriptions;
 CREATE TABLE ChampionPassiveDescriptions(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	description TEXT,
@@ -949,7 +942,7 @@ CREATE TABLE ChampionPassiveDescriptions(
 DROP TABLE IF EXISTS ChampionPassiveImages;
 CREATE TABLE ChampionPassiveImages(
 	auto_id SERIAL PRIMARY KEY,
-	championId INT REFERENCES Champions(id),
+	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	fullURL TEXT,
 	spriteURL TEXT,
@@ -1184,19 +1177,7 @@ CREATE TABLE SummonerSpellImages(
 	h INT,
 );
 
-DROP TABLE IF EXISTS Maps;
-CREATE TABLE Maps(
-	auto_id SERIAL PRIMARY KEY,
-	id INT,
-	patch TEXT REFERENCES Patches(patch),
-	name TEXT,
-	fullURL TEXT,
-	spriteURL TEXT,
-	x INT,
-	y INT,
-	w INT,
-	h INT,
-);
+
 
 DROP TABLE IF EXISTS MapUnpurchasableItems;
 CREATE TABLE MapUnpurchasableItems(
