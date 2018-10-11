@@ -208,7 +208,7 @@ CREATE TABLE Champions(
 
 CREATE TABLE Items(
 	auto_id SERIAL PRIMARY KEY,
-	patch TEXT,
+	patch TEXT REFERENCES Patches(patch),
 	id INT,
 	requiredChampion INT REFERENCES Champions(auto_id),
 	inStore BOOLEAN,
@@ -1159,14 +1159,14 @@ CREATE TABLE RunesReforgedRuneLongDescriptions(
 
 CREATE TABLE MasteryNames(
 	auto_id SERIAL PRIMARY KEY,
-	masteryId INT,
+	masteryId INT REFERENCES Masteries(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	name TEXT);
 
 CREATE TABLE MasteryDescriptions(
 	auto_id SERIAL PRIMARY KEY,
-	masteryId INT,
+	masteryId INT REFERENCES Masteries(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	description TEXT,
@@ -1174,7 +1174,7 @@ CREATE TABLE MasteryDescriptions(
 
 CREATE TABLE MasteryImages(
 	auto_id SERIAL PRIMARY KEY,
-	masteryId INT,
+	masteryId INT REFERENCES Masteries(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	fullURL TEXT,
 	spriteURL TEXT,
