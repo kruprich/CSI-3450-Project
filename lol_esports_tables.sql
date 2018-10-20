@@ -127,7 +127,7 @@ DROP TABLE IF EXISTS MapUnpurchasableItems CASCADE;
 CREATE TABLE LanguageCodes(
 	auto_id SERIAL,
 	languageCode TEXT PRIMARY KEY,
-	language TEXT
+	languageText TEXT
 );
 
 CREATE TABLE Patches(
