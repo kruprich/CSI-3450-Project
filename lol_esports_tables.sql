@@ -145,15 +145,15 @@ CREATE TABLE LanguageItems(
 CREATE TABLE Leagues(
 	auto_id SERIAL,
 	id INT PRIMARY KEY,
-	guid TEXT,
-	name TEXT,
+	gId TEXT,
+	leagueName TEXT,
 	logoURL TEXT);
 
 CREATE TABLE Tournaments(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
 	title TEXT,
-	description TEXT,
+	tournamentDescription TEXT,
 	leagueId INT REFERENCES Leagues(id));
 
 CREATE TABLE Players(
@@ -170,7 +170,7 @@ CREATE TABLE Players(
 CREATE TABLE Teams(
  	auto_id SERIAL,
  	id INT PRIMARY KEY,
- 	name TEXT,
+ 	teamName TEXT,
  	photoURL TEXT,
  	logoURL TEXT,
  	acronym TEXT,
@@ -180,7 +180,7 @@ CREATE TABLE Teams(
 CREATE TABLE TournamentBrackets(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
-	name TEXT,
+	tournamentBracketsName TEXT,
 	groupPosition INT,
 	groupName TEXT);
 
@@ -189,7 +189,7 @@ CREATE TABLE Matches(
 	id TEXT PRIMARY KEY,
 	tournamentId TEXT REFERENCES Tournaments(id),
 	bracketId TEXT REFERENCES TournamentBrackets(id),
-	name TEXT,
+	matchesName TEXT,
 	position INT);
 
 CREATE TABLE Games(
@@ -198,7 +198,7 @@ CREATE TABLE Games(
 	matchId TEXT REFERENCES Matches(id),
 	bracketId TEXT REFERENCES TournamentBrackets(id),
 	tournamentId TEXT REFERENCES Tournaments(id),
-	name TEXT);
+	gamesName TEXT);
 
 CREATE TABLE Champions(
 	auto_id SERIAL PRIMARY KEY,
@@ -236,7 +236,7 @@ CREATE TABLE Maps(
 	auto_id SERIAL PRIMARY KEY,
 	id INT,
 	patch TEXT REFERENCES Patches(patch),
-	name TEXT,
+	mapsName TEXT,
 	fullURL TEXT,
 	spriteURL TEXT,
 	x INT,
@@ -296,7 +296,7 @@ CREATE TABLE PlayerTournamentStats(
 	auto_id SERIAL PRIMARY KEY,
 	playerId INT REFERENCES Players(id),
 	teamId INT REFERENCES Teams(id),
-	name TEXT,
+	PlayerTournamentStatsName TEXT,
 	position TEXT,
 	teamAcronym TEXT,
 	gamesPlayed INT,
@@ -438,7 +438,7 @@ CREATE TABLE PlayerStatsHistories(
 CREATE TABLE TournamentTeams(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
-	name TEXT, -- Acronym
+	TournamentTeamsName TEXT, -- Acronym
 	teamId INT REFERENCES Teams(id));
 
 CREATE TABLE TournamentBracketTypes(
@@ -458,7 +458,7 @@ CREATE TABLE TournamentBracketMatchTypes(
 CREATE TABLE TournamentRosters(
 	auto_id SERIAL,
 	id TEXT PRIMARY KEY,
-	name TEXT,
+	turnamentRostersName TEXT,
 	teamId INT REFERENCES Teams(id),
 	tournamentId TEXT REFERENCES Tournaments(id));
 
@@ -478,7 +478,7 @@ CREATE TABLE LeagueNames(
 	auto_id SERIAL PRIMARY KEY,
 	leagueId INT REFERENCES Leagues(id),
  	languageCode TEXT REFERENCES LanguageCodes(languageCode),
- 	name TEXT);
+ 	leagueNamesName TEXT);
 
 CREATE TABLE LeagueTournamentRecords(
 	auto_id SERIAL,
@@ -794,14 +794,14 @@ CREATE TABLE ItemNames(
 	itemId INT REFERENCES Items(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	itemName TEXT);
 
 CREATE TABLE ItemDescriptions(
 	auto_id SERIAL PRIMARY KEY,
 	itemId INT REFERENCES Items(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	description TEXT);
+	itemDescription TEXT);
 
 CREATE TABLE ItemPlaintexts(
 	auto_id SERIAL PRIMARY KEY,
@@ -864,7 +864,7 @@ CREATE TABLE ChampionNames(
 	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	championName TEXT);
 
 CREATE TABLE ChampionTitles(
 	auto_id SERIAL PRIMARY KEY,
@@ -945,7 +945,7 @@ CREATE TABLE ChampionSkins(
 	id INT,
 	championId INT REFERENCES Champions(auto_id),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT,
+	championSkinsname TEXT,
 	num INT,
 	hasChromas BOOLEAN);
 
@@ -996,14 +996,14 @@ CREATE TABLE ChampionSpellNames(
 	spellId INT REFERENCES ChampionSpells(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	championSpellNamesName TEXT);
 
 CREATE TABLE ChampionSpellDescriptions(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	description TEXT);
+	championSpelldescription TEXT);
 
 CREATE TABLE ChampionSpellTooltips(
 	auto_id SERIAL PRIMARY KEY,
@@ -1062,14 +1062,14 @@ CREATE TABLE ChampionPassiveNames(
 	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	championPassiveName TEXT);
 
 CREATE TABLE ChampionPassiveDescriptions(
 	auto_id SERIAL PRIMARY KEY,
 	championId INT REFERENCES Champions(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	description TEXT);
+	ChampionPassiveDescription TEXT);
 
 CREATE TABLE ChampionPassiveImages(
 	auto_id SERIAL PRIMARY KEY,
@@ -1087,14 +1087,14 @@ CREATE TABLE RuneNames(
 	runeId INT REFERENCES Runes(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	runeName TEXT);
 
 CREATE TABLE RuneDescriptions(
 	auto_id SERIAL PRIMARY KEY,
 	runeId INT REFERENCES Runes(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	runeDescriptionsName TEXT);
 
 CREATE TABLE RuneTags(
 	auto_id SERIAL PRIMARY KEY,
@@ -1125,7 +1125,7 @@ CREATE TABLE RunesReforgedName(
 	runesReforgedId INT REFERENCES RunesReforged(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	runesReforgedName TEXT);
 
 CREATE TABLE RunesReforgedRunes(
 	auto_id SERIAL PRIMARY KEY,
@@ -1141,7 +1141,7 @@ CREATE TABLE RunesReforgedRuneNames(
 	runesReforgedRuneId INT REFERENCES RunesReforgedRunes(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	runesReforgedRuneName TEXT);
 
 CREATE TABLE RunesReforgedRuneShortDescriptions(
 	auto_id SERIAL PRIMARY KEY,
@@ -1162,14 +1162,14 @@ CREATE TABLE MasteryNames(
 	masteryId INT REFERENCES Masteries(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	masteryName TEXT);
 
 CREATE TABLE MasteryDescriptions(
 	auto_id SERIAL PRIMARY KEY,
 	masteryId INT REFERENCES Masteries(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	description TEXT,
+	masteryDescription TEXT,
 	descriptionIndex INT);
 
 CREATE TABLE MasteryImages(
@@ -1188,14 +1188,14 @@ CREATE TABLE SummonerSpellNames(
 	summonerId INT REFERENCES SummonerSpells(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	name TEXT);
+	summonerSpellName TEXT);
 
 CREATE TABLE SummonerSpellDescriptions(
 	auto_id SERIAL PRIMARY KEY,
 	summonerId INT REFERENCES SummonerSpells(auto_id),
 	patch TEXT REFERENCES Patches(patch),
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
-	description TEXT);
+	summonerSpelldescription TEXT);
 
 CREATE TABLE SummonerSpellTooltips(
 	auto_id SERIAL PRIMARY KEY,
