@@ -127,20 +127,17 @@ DROP TABLE IF EXISTS MapUnpurchasableItems CASCADE;
 CREATE TABLE LanguageCodes(
 	auto_id SERIAL,
 	languageCode TEXT PRIMARY KEY,
-	languageText TEXT
-);
+	languageText TEXT);
 
 CREATE TABLE Patches(
 	auto_id SERIAL,
-	patch TEXT PRIMARY KEY
-);
+	patch TEXT PRIMARY KEY);
 
 CREATE TABLE LanguageItems(
 	auto_id SERIAL PRIMARY KEY,
 	languageCode TEXT REFERENCES LanguageCodes(languageCode),
 	patch TEXT REFERENCES Patches(patch),
-	languageItem TEXT
-);
+	languageItem TEXT);
 
 CREATE TABLE Leagues(
 	auto_id SERIAL,
